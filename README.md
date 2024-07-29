@@ -1,0 +1,2 @@
+# ezcode
+AI Learning Platform
