@@ -89,5 +89,3 @@ def generate_russian(course_path):
             print("Sleeping for 15 seconds")
             time.sleep(15)
     return course
-# english = generate_english('../../python.yaml')
-russian = generate_russian('../../python.yaml')
