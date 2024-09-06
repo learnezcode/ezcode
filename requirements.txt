@@ -3,4 +3,4 @@ asyncio
 aiohttp
 xata
 PyYAML
-google-generativeai
+requests
