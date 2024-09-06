@@ -66,10 +66,10 @@ async def gen_markup(mu_type, courses=None):
         keyboard = [[InlineKeyboardButton(text="✅ Официальные курсы ✅", callback_data='off_courses')],[InlineKeyboardButton(text="🧑🏻‍💻 Курсы от подтвержденных авторов 🧑🏻‍💻", callback_data='ver_courses')],[InlineKeyboardButton(text="👨‍👨‍👦 Курсы от сообщества 👨‍👨‍👦", callback_data='com_courses')], [InlineKeyboardButton(text='⚙️ Поменять язык ⚙️', callback_data='lang_settings')]]
     elif mu_type == 'courses_official':
         for course in courses:
-            keyboard.append([InlineKeyboardButton(text=course['content'][0]['name'], callback_data=f'official_{course['id']}')])
+            keyboard.append([InlineKeyboardButton(text=course['content'][0]['name'], callback_data=f"official_{course['id']}")])
     elif mu_type == 'course_official_steps':
         for parts in courses['content'][0]['content']:
-            keyboard.append([InlineKeyboardButton(text=f'{parts['chapter']}. {parts['chapter-name']}', callback_data=f'off-{courses['id']}-{parts['chapter']}')])
+            keyboard.append([InlineKeyboardButton(text=f'{parts['chapter']}. {parts['chapter-name']}', callback_data=f"off-{courses['id']}-{parts['chapter']}")])
     markup = InlineKeyboardMarkup(keyboard)
     return markup
 
