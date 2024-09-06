@@ -1,2 +1,6 @@
+pyTelegramBotAPI
+asyncio
+aiohttp
+xata
 PyYAML
 google-generativeai
