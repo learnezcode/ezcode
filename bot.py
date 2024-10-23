@@ -10,9 +10,7 @@ import ast
 import textwrap
 import re
 
-print("ezcode bot v0.1 @csoftware")
-
-
+print("ezcode bot v0.2 @csoftware")
 
 bot = AsyncTeleBot(config.bot_token)
 xata = XataClient(api_key=config.xata_key, db_url=config.xata_endpoint)
@@ -59,17 +57,17 @@ async def split_message(message, max_length=4096):
 async def gen_markup(mu_type, courses=None):
     keyboard = []
     if mu_type == 'lang':
-       keyboard = [[InlineKeyboardButton(text="🇷🇺 Русский", callback_data='lang_ru'),InlineKeyboardButton(text="🇬🇧English", callback_data='lang_en')]]
+       keyboard = [[InlineKeyboardButton(text="🇷🇺 Русский", callback_data='lang_ru'),InlineKeyboardButton(text="🇬🇧English", callback_data='lang_en'), ,InlineKeyboardButton(text="🇧🇾Беларускi (β)", callback_data='lang_by')]]
     elif mu_type == 'main_en':
         keyboard = [[InlineKeyboardButton(text="✅ Official courses ✅", callback_data='off_courses')],[InlineKeyboardButton(text="🧑🏻‍💻 Courses from verified authors 🧑🏻‍💻", callback_data='ver_courses')],[InlineKeyboardButton(text="👨‍👨‍👦 Community courses 👨‍👨‍👦", callback_data='com_courses')], [InlineKeyboardButton(text='⚙️ Change language ⚙️', callback_data='lang_settings')]]
     elif mu_type == 'main_ru':
         keyboard = [[InlineKeyboardButton(text="✅ Официальные курсы ✅", callback_data='off_courses')],[InlineKeyboardButton(text="🧑🏻‍💻 Курсы от подтвержденных авторов 🧑🏻‍💻", callback_data='ver_courses')],[InlineKeyboardButton(text="👨‍👨‍👦 Курсы от сообщества 👨‍👨‍👦", callback_data='com_courses')], [InlineKeyboardButton(text='⚙️ Поменять язык ⚙️', callback_data='lang_settings')]]
     elif mu_type == 'courses_official':
         for course in courses:
-            keyboard.append([InlineKeyboardButton(text=course['content'][0]['name'], callback_data=f"official_{course['id']}")])
+            keyboard.append([InlineKeyboardButton(text=course['content'][0]['name'], callback_data=f'official_{course['id']}')])
     elif mu_type == 'course_official_steps':
         for parts in courses['content'][0]['content']:
-            keyboard.append([InlineKeyboardButton(text=f'{parts["chapter"]}. {parts["chapter-name"]}', callback_data=f"off-{courses['id']}-{parts['chapter']}")])
+            keyboard.append([InlineKeyboardButton(text=f'{parts['chapter']}. {parts['chapter-name']}', callback_data=f'off-{courses['id']}-{parts['chapter']}')])
     markup = InlineKeyboardMarkup(keyboard)
     return markup
 
@@ -102,6 +100,7 @@ async def escape_symbols(text):
 
 @bot.message_handler(commands=['start'])
 async def send_welcome(message):
+    if message.from_user.id == 617090773:
         get_id = xata.records().get('users', message.from_user.id)
         print(get_id)
         try:
@@ -116,67 +115,68 @@ async def send_welcome(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 async def callback_query(call):
-    if call.data == "lang_ru":
-        xata.records().insert_with_id('users', call.from_user.id, {'language': 'ru', 'status': 'basic'})
-        await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption='Добро пожаловать в ezcode', reply_markup=await gen_markup('main_ru'), timeout=1000000000)
-    elif call.data == "lang_en":
-        xata.records().insert_with_id('users', call.from_user.id, {'language': 'en', 'status': 'basic'})
-        await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption='Welcome to ezcode', reply_markup=await gen_markup('main_en'), timeout=1000000000)
-    elif call.data == 'lang_settings':
-        text = '🇬🇧 Choose your language\n🇷🇺 Выберите ваш язык'
-        await bot.send_photo(call.from_user.id,photo=open('./banner/banner-lang.png', 'rb'), caption=text, reply_markup=await gen_markup('lang'))
-    elif call.data == 'off_courses':
-        courses_off_list = await parse_official_courses(str(call.from_user.id))
-        get_info = xata.records().get('users', call.from_user.id)
-        if get_info['language'] == 'ru':
-            await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption='*ezcode officials* \- курсы, разработанные администрацией ezcode\nМы уверены на 100% что они вас научат новым навыкам программирования\n\n*Выберите курс*', parse_mode='MarkdownV2', reply_markup=await gen_markup('courses_official', courses=courses_off_list), timeout=1000000000)
-        elif get_info['language'] == 'en':
-            await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption='*ezcode officials* \- courses developed by ezcode administration\nWe are 100% sure that they will teach you new programming skills\n\n*Choose a course*', parse_mode='MarkdownV2', reply_markup=await gen_markup('courses_official', courses=courses_off_list), timeout=1000000000)
-    elif 'official_' in call.data:
-            course_id = call.data
-            course_id = course_id.replace('official_', '')
+    if call.from_user.id == 617090773:
+        if call.data == "lang_ru":
+            xata.records().insert_with_id('users', call.from_user.id, {'language': 'ru', 'status': 'basic'})
+            await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption='Добро пожаловать в ezcode', reply_markup=await gen_markup('main_ru'), timeout=1000000000)
+        elif call.data == "lang_en":
+            xata.records().insert_with_id('users', call.from_user.id, {'language': 'en', 'status': 'basic'})
+            await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption='Welcome to ezcode', reply_markup=await gen_markup('main_en'), timeout=1000000000)
+        elif call.data == 'lang_settings':
+            text = '🇬🇧 Choose your language\n🇷🇺 Выберите ваш язык'
+            await bot.send_photo(call.from_user.id,photo=open('./banner/banner-lang.png', 'rb'), caption=text, reply_markup=await gen_markup('lang'))
+        elif call.data == 'off_courses':
             courses_off_list = await parse_official_courses(str(call.from_user.id))
-            course_info = []
-            for course in courses_off_list:
-                if course_id == course['id']:
-                    course_info = course
+            get_info = xata.records().get('users', call.from_user.id)
+            if get_info['language'] == 'ru':
+                await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption='*ezcode officials* \- курсы, разработанные администрацией ezcode\nМы уверены на 100% что они вас научат новым навыкам программирования\n\n*Выберите курс*', parse_mode='MarkdownV2', reply_markup=await gen_markup('courses_official', courses=courses_off_list), timeout=1000000000)
+            elif get_info['language'] == 'en':
+                await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption='*ezcode officials* \- courses developed by ezcode administration\nWe are 100% sure that they will teach you new programming skills\n\n*Choose a course*', parse_mode='MarkdownV2', reply_markup=await gen_markup('courses_official', courses=courses_off_list), timeout=1000000000)
+        elif 'official_' in call.data:
+                course_id = call.data
+                course_id = course_id.replace('official_', '')
+                courses_off_list = await parse_official_courses(str(call.from_user.id))
+                course_info = []
+                for course in courses_off_list:
+                    if course_id == course['id']:
+                        course_info = course
+                get_info = xata.records().get('users', call.from_user.id)
+                if get_info['language'] == 'en':
+                    await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption=f"Name: {course_info['content'][0]['name']}\nDescription: {course_info['content'][0]['desc']}", reply_markup = await gen_markup('course_official_steps', course_info),timeout=1000000000)
+                elif get_info['language'] == 'ru':
+                    await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption=f"Название: {course_info['content'][0]['name']}\nОписание: {course_info['content'][0]['desc']}", reply_markup = await gen_markup('course_official_steps', course_info), timeout=1000000000)
+        elif call.data == 'ver_courses':
             get_info = xata.records().get('users', call.from_user.id)
             if get_info['language'] == 'en':
-                await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption=f"Name: {course_info['content'][0]['name']}\nDescription: {course_info['content'][0]['desc']}", reply_markup = await gen_markup('course_official_steps', course_info),timeout=1000000000)
+                await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption="generating...", timeout=1000000000)
             elif get_info['language'] == 'ru':
-                await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption=f"Название: {course_info['content'][0]['name']}\nОписание: {course_info['content'][0]['desc']}", reply_markup = await gen_markup('course_official_steps', course_info), timeout=1000000000)
-    elif call.data == 'ver_courses':
-        get_info = xata.records().get('users', call.from_user.id)
-        if get_info['language'] == 'en':
-            await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption="generating...", timeout=1000000000)
-        elif get_info['language'] == 'ru':
-            await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption=f"генерируется...", timeout=1000000000)
+                await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption=f"генерируется...", timeout=1000000000)
 
-    elif call.data == 'com_courses':
-        get_info = xata.records().get('users', call.from_user.id)
-        if get_info['language'] == 'en':
-                await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption="Soon...\n\nIf you would like to write a course: https://github.com/learnezcode/ezcode-course\nPost on our platform: @contactlabsbot", timeout=1000000000)
-        elif get_info['language'] == 'ru':
-                await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption=f"Скоро будет доступно\n\nЕсли вы хотите написать курс: https://github.com/learnezcode/ezcode-course\nВыложить на нашей платформе: @contactlabsbot", timeout=1000000000)
-
-    else:
-        type, course_db, chapter_id = call.data.split('-')
-        if type == 'off':
-            courses_off_list = await parse_official_courses(str(call.from_user.id))
-            course_info = []
-            for course in courses_off_list:
-                if course_db == course['id']:
-                    course_info = course['content'][0]['content']
+        elif call.data == 'com_courses':
             get_info = xata.records().get('users', call.from_user.id)
-            text_for = course_info[int(chapter_id)-1]['text']
+            if get_info['language'] == 'en':
+                    await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption="Soon...\n\nIf you would like to write a course: https://github.com/learnezcode/ezcode-course\nPost on our platform: @contactlabsbot", timeout=1000000000)
+            elif get_info['language'] == 'ru':
+                    await bot.send_photo(call.from_user.id,photo=open('./banner/banner-main.png', 'rb'), caption=f"Скоро будет доступно\n\nЕсли вы хотите написать курс: https://github.com/learnezcode/ezcode-course\nВыложить на нашей платформе: @contactlabsbot", timeout=1000000000)
 
-            final_text = await escape_symbols(text_for)
-            if len(final_text) >= 4096:
-                final_text = await split_message(final_text)
-                for text in final_text:
-                    await bot.send_message(call.from_user.id, text, parse_mode='MarkdownV2')
-                    time.sleep(1)
-            else:
-               await bot.send_message(call.from_user.id, final_text, parse_mode='MarkdownV2')
+        else:
+            type, course_db, chapter_id = call.data.split('-')
+            if type == 'off':
+                courses_off_list = await parse_official_courses(str(call.from_user.id))
+                course_info = []
+                for course in courses_off_list:
+                    if course_db == course['id']:
+                        course_info = course['content'][0]['content']
+                get_info = xata.records().get('users', call.from_user.id)
+                text_for = course_info[int(chapter_id)-1]['text']
+
+                final_text = await escape_symbols(text_for)
+                if len(final_text) >= 4096:
+                    final_text = await split_message(final_text)
+                    for text in final_text:
+                        await bot.send_message(call.from_user.id, text, parse_mode='MarkdownV2')
+                        time.sleep(1)
+                else:
+                    await bot.send_message(call.from_user.id, final_text, parse_mode='MarkdownV2')
 print('starting bot')
 asyncio.run(bot.infinity_polling(True))
