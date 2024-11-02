@@ -1,4 +1,6 @@
-gemini_key = ''
+auth_key = ''
+organizaton = ''
+project = ''
 
 bot_token=''
 
