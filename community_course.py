@@ -5,7 +5,7 @@ import base64
 import table_init
 import asyncio
 
-def official_course(file):
+def community_course(file, user_id):
     xata = XataClient(api_key=config.xata_key, db_url=config.xata_endpoint)
     print('Initialising table')
     asyncio.run(table_init.init_db())
@@ -20,7 +20,7 @@ def official_course(file):
     ru_file_base64 = base64.b64encode(ru.encode(encoding="utf-8")).decode('utf-8')
     by_file_base64 = base64.b64encode(by.encode(encoding='utf-8')).decode('utf-8')
     # Prepare the record to be inserted
-    record = xata.records().insert("courses_official", {
+    record = xata.records().insert("courses_community", {
         "en": {
             "base64Content": en_file_base64,
         },
@@ -29,8 +29,9 @@ def official_course(file):
         },
         "by": {
            'base64Content': by_file_base64,
-        }
+        },
+        "user_id": int(user_id)
     })
     return record
 
-print(official_course('python.yaml'))
+print(community_course('s.yaml', '1437220885'))
